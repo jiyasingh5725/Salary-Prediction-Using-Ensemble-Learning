@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary Predictor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+        .form-container {
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 2rem;
+            max-width: 500px;
+            margin: auto;
+        }
+        .form-group label {
+            font-weight: 600;
+            color: #374151;
+        }
+        .form-group input, .form-group select {
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            padding: 0.5rem;
+            width: 100%;
+            margin-top: 0.5rem;
+            font-size: 1rem;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        .submit-button {
+            background-color: #3b82f6;
+            color: #ffffff;
+            font-weight: 600;
+            padding: 0.75rem;
+            border-radius: 4px;
+            width: 100%;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .submit-button:hover {
+            background-color: #2563eb;
+        }
+        .prediction-result {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #d1fae5;
+            border: 1px solid #10b981;
+            border-radius: 4px;
+            color: #065f46;
+            font-weight: 600;
+        }
+        .error-message {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #fee2e2;
+            border: 1px solid #f87171;
+            border-radius: 4px;
+            color: #991b1b;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <div class="form-container">
+        <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">SALARY PREDICTOR</h1>
+
+        <form id="salaryForm" class="space-y-4">
+            <div class="form-group">
+                <label for="age">Age:</label>
+                <input type="number" id="age" name="age" min="18" max="100" required>
+            </div>
+            <div class="form-group">
+                <label for="yearsExperience">Years of Experience:</label>
+                <input type="number" id="yearsExperience" name="yearsExperience" step="0.1" min="0" max="50" required>
+            </div>
+            <div class="form-group">
+                <label for="educationLevel">Education Level:</label>
+                <select id="educationLevel" name="educationLevel" required>
+                    <option value="">Select Education</option>
+                    <option value="High School">High School</option>
+                    <option value="Bachelor's">Bachelor's</option>
+                    <option value="Master's">Master's</option>
+                    <option value="PhD">PhD</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="jobTitle">Job Title:</label>
+                <select id="jobTitle" name="jobTitle" required>
+                    <option value="">Select Job Title</option>
+                    <option value="Software Engineer">Software Engineer</option>
+                    <option value="Data Scientist">Data Scientist</option>
+                    <option value="Project Manager">Project Manager</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="country">Country:</label>
+                <select id="country" name="country" required>
+                    <option value="">Select Country</option>
+                    <option value="USA">USA</option>
+                    <option value="Canada">Canada</option>
+                    <option value="UK">UK</option>
+                </select>
+            </div>
+            <button type="submit" class="submit-button">
+                <span id="buttonText">Predict Salary</span>
+            </button>
+        </form>
+
+        <div id="predictionResult" class="prediction-result hidden">
+            Predicted Salary: <span id="predictedSalaryValue"></span>
+        </div>
+
+        <div id="messageBox" class="error-message hidden"></div>
+    </div>
+
+    <script>
+        document.getElementById('salaryForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const buttonText = document.getElementById('buttonText');
+            const predictionResultDiv = document.getElementById('predictionResult');
+            const predictedSalaryValueSpan = document.getElementById('predictedSalaryValue');
+            const messageBox = document.getElementById('messageBox');
+
+            buttonText.textContent = 'Predicting...';
+            predictionResultDiv.classList.add('hidden');
+            messageBox.classList.add('hidden');
+
+            const age = parseFloat(document.getElementById('age').value);
+            const yearsExperience = parseFloat(document.getElementById('yearsExperience').value);
+            const educationLevel = document.getElementById('educationLevel').value;
+            const jobTitle = document.getElementById('jobTitle').value;
+            const country = document.getElementById('country').value;
+
+            if (!age || !yearsExperience || !educationLevel || !jobTitle || !country) {
+                messageBox.textContent = 'Please fill in all fields.';
+                messageBox.classList.remove('hidden');
+                buttonText.textContent = 'Predict Salary';
+                return;
+            }
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/predict_salary', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        Age: age,
+                        YearsExperience: yearsExperience,
+                        EducationLevel: educationLevel,
+                        JobTitle: jobTitle,
+                        Country: country
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch prediction from the server.');
+                }
+
+                const data = await response.json();
+                if (data.predicted_salary) {
+                    predictedSalaryValueSpan.textContent = `$${data.predicted_salary.toFixed(2)}`;
+                    predictionResultDiv.classList.remove('hidden');
+                } else {
+                    messageBox.textContent = 'Error: Unable to get prediction.';
+                    messageBox.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                messageBox.textContent = 'An error occurred while predicting the salary.';
+                messageBox.classList.remove('hidden');
+            } finally {
+                buttonText.textContent = 'Predict Salary';
+            }
+        });
+    </script>
+</body>
+</html>
