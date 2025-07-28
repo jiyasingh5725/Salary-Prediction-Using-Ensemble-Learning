@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #829bdf, #9333ea);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 0; /* Remove extra padding */
+            box-sizing: border-box;
+        }
+
+        .result-container {
+            background: linear-gradient(135deg, #f3e8ff, #fef2f2); /* Soft gradient background */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Soft shadow */
+            border-radius: 20px; /* Rounded corners */
+            padding: 4rem; /* Increase padding */
+            display: flex; /* Flexbox layout */
+            justify-content: space-between; /* Space between salary and chart */
+            align-items: center; /* Align items vertically */
+            max-width: 90%; /* Increase width */
+            width: 90%; /* Ensure it covers most of the page */
+            height: 90%; /* Increase height to cover more of the page */
+        }
+
+        .salary-details {
+            flex: 1; /* Take up equal space */
+            text-align: left; /* Align text to the left */
+            padding-right: 2rem; /* Add spacing between salary and chart */
+        }
+
+        .salary-details h1 {
+            font-size: 4rem; /* Increase font size */
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 1.5rem; /* Increase spacing */
+        }
+
+        .salary-details p {
+            font-size: 2rem; /* Increase font size */
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            flex: 1; /* Take up equal space */
+            padding: 2rem; /* Increase padding */
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px; /* Rounded corners for chart container */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Soft shadow */
+            max-width: 40%; /* Ensure chart fits within the container */
+        }
+
+        .chart-container h2 {
+            font-size: 2.5rem; /* Increase font size */
+            font-weight: 600;
+            color: #1e3a8a;
+            margin-bottom: 1.5rem; /* Increase spacing */
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .result-container {
+                flex-direction: column; /* Stack salary and chart vertically on smaller screens */
+                padding: 2rem; /* Reduce padding for smaller screens */
+                width: 95%; /* Adjust width for smaller screens */
+                height: auto; /* Adjust height for smaller screens */
+            }
+
+            .salary-details {
+                text-align: center; /* Center text on smaller screens */
+                padding-right: 0; /* Remove spacing */
+                margin-bottom: 2rem; /* Add spacing between salary and chart */
+            }
+
+            .salary-details h1 {
+                font-size: 3rem; /* Adjust title size */
+            }
+
+            .salary-details p {
+                font-size: 1.75rem; /* Adjust salary result size */
+            }
+
+            .chart-container h2 {
+                font-size: 2rem; /* Adjust chart title size */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="result-container">
+        <div class="salary-details">
+            <h1>PREDICTION RESULT</h1>
+            <p id="salaryResult"></p>
+        </div>
+
+        <div class="chart-container">
+            <h2>Salary Breakdown</h2>
+            <canvas id="salaryChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Extract salary from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const salary = parseFloat(urlParams.get('salary'));
+
+        // Display the predicted salary
+        document.getElementById('salaryResult').textContent = `Predicted Salary: $${salary.toFixed(2)}`;
+
+        // Generate a chart for salary breakdown
+        const ctx = document.getElementById('salaryChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Base Salary', 'Bonus', 'Other Benefits'],
+                datasets: [{
+                    label: 'Salary Breakdown',
+                    data: [salary * 0.7, salary * 0.2, salary * 0.1], // Example breakdown
+                    backgroundColor: ['#1e3a8a', '#9333ea', '#34d399'],
+                    borderColor: ['#1e3a8a', '#9333ea', '#34d399'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                size: 16 /* Increase font size for legend */
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return `$${tooltipItem.raw.toFixed(2)}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -9,70 +9,92 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f9fafb;
+            background: linear-gradient(135deg, #3b82f6, #9333ea);
+            animation: gradientBG 16s ease infinite;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
         }
+
+        @keyframes gradientBG {
+            0% { background: linear-gradient(135deg, #3b82f6, #9333ea); }
+            20% { background: linear-gradient(135deg, #9333ea, #f59e0b); }
+            40% { background: linear-gradient(135deg, #f59e0b, #10b981); }
+            60% { background: linear-gradient(135deg, #10b981, #3b82f6); }
+            80% { background: linear-gradient(135deg, #3b82f6, #9333ea); }
+            100% { background: linear-gradient(135deg, #3b82f6, #9333ea); }
+        }
+
         .form-container {
-            background-color: #ffffff;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
             padding: 2rem;
             max-width: 500px;
-            margin: auto;
+            width: 100%;
+            animation: fadeIn 1s ease;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .form-group label {
             font-weight: 600;
             color: #374151;
         }
+
         .form-group input, .form-group select {
             border: 1px solid #d1d5db;
-            border-radius: 4px;
-            padding: 0.5rem;
+            border-radius: 6px;
+            padding: 0.75rem;
             width: 100%;
             margin-top: 0.5rem;
             font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
+
         .form-group input:focus, .form-group select:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+            border-color: #9333ea;
+            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.3);
         }
+
         .submit-button {
-            background-color: #3b82f6;
+            background-color: #9333ea;
             color: #ffffff;
             font-weight: 600;
             padding: 0.75rem;
-            border-radius: 4px;
+            border-radius: 6px;
             width: 100%;
             text-align: center;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
+
         .submit-button:hover {
-            background-color: #2563eb;
+            background-color: #7e22ce;
+            transform: scale(1.05);
         }
-        .prediction-result {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            background-color: #d1fae5;
-            border: 1px solid #10b981;
-            border-radius: 4px;
-            color: #065f46;
-            font-weight: 600;
-        }
+
         .error-message {
             margin-top: 1rem;
             padding: 1rem;
             background-color: #fee2e2;
             border: 1px solid #f87171;
-            border-radius: 4px;
+            border-radius: 6px;
             color: #991b1b;
             font-weight: 600;
+            animation: fadeIn 0.5s ease;
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen">
+<body>
     <div class="form-container">
-        <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">SALARY PREDICTOR</h1>
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Salary Predictor</h1>
 
         <form id="salaryForm" class="space-y-4">
             <div class="form-group">
@@ -116,10 +138,6 @@
             </button>
         </form>
 
-        <div id="predictionResult" class="prediction-result hidden">
-            Predicted Salary: <span id="predictedSalaryValue"></span>
-        </div>
-
         <div id="messageBox" class="error-message hidden"></div>
     </div>
 
@@ -128,12 +146,9 @@
             event.preventDefault();
 
             const buttonText = document.getElementById('buttonText');
-            const predictionResultDiv = document.getElementById('predictionResult');
-            const predictedSalaryValueSpan = document.getElementById('predictedSalaryValue');
             const messageBox = document.getElementById('messageBox');
 
             buttonText.textContent = 'Predicting...';
-            predictionResultDiv.classList.add('hidden');
             messageBox.classList.add('hidden');
 
             const age = parseFloat(document.getElementById('age').value);
@@ -168,8 +183,8 @@
 
                 const data = await response.json();
                 if (data.predicted_salary) {
-                    predictedSalaryValueSpan.textContent = `$${data.predicted_salary.toFixed(2)}`;
-                    predictionResultDiv.classList.remove('hidden');
+                    // Redirect to a new page with the prediction data
+                    window.location.href = `prediction.html?salary=${data.predicted_salary}`;
                 } else {
                     messageBox.textContent = 'Error: Unable to get prediction.';
                     messageBox.classList.remove('hidden');
