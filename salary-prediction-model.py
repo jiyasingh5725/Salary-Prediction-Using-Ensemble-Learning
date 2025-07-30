@@ -4,131 +4,109 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, VotingRegressor
+from sklearn.ensemble import RandomForestRegressor, VotingRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.impute import SimpleImputer
 import lightgbm as lgb
 import xgboost as xgb
 import warnings
 import joblib
 
-# Suppress warnings for cleaner output
-warnings.filterwarnings('ignore')
+warnings.filterwarnings('ignore')  # Clean output
 
 # --- 1. Load Dataset ---
-print("Loading dataset...")
-df = pd.read_csv(r'C:\Users\hp\Salary-Prediction-Using-Ensemble-Learning\eda_data.csv')
-print("Dataset loaded successfully.")
-print(df.head())
-print(f"Dataset shape: {df.shape}\n")
+print("Loading Salary Data...")
+df = pd.read_csv('Salary Data.csv')  # Update path if needed
 
-# --- 2. Data Preprocessing ---
+# --- 2. Preprocessing ---
+print("Cleaning and preparing data...")
 
-# Define features (X) and target (y)
-X = df[['age', 'hourly', 'employer_provided', 'min_salary', 'max_salary', 'avg_salary', 'job_state', 'python_yn', 'R_yn', 'spark', 'aws', 'excel', 'job_simp', 'seniority', 'desc_len', 'num_comp']]
-y = df['avg_salary']  # Use 'avg_salary' as the target variable
+# Rename salary column for consistency
+df.rename(columns={'Salary': 'avg_salary',
+                   'Years of Experience': 'experience_years',
+                   'Education Level': 'education_level'}, inplace=True)
 
-# Identify categorical and numerical features
-categorical_features = ['job_state', 'job_simp', 'seniority']
-numerical_features = ['age', 'hourly', 'employer_provided', 'min_salary', 'max_salary', 'num_comp']
+# Handle missing values
+df['education_level'].fillna('Unknown', inplace=True)
+df['experience_years'].fillna(df['experience_years'].median(), inplace=True)
 
-# Create a column transformer for preprocessing
+# Sanity check for numeric types
+df['experience_years'] = pd.to_numeric(df['experience_years'], errors='coerce')
+df['avg_salary'] = pd.to_numeric(df['avg_salary'], errors='coerce')
+
+# Drop any remaining missing
+df.dropna(inplace=True)
+
+# --- 3. Define Features and Target ---
+X = df[['age', 'job_simp', 'education_level', 'experience_years']]
+y = df['avg_salary']
+
+# Sanity check
+print("Salary range:", y.min(), "to", y.max())
+print(y.sample(5), "\n")
+
+# Define feature types
+categorical_features = ['job_simp', 'education_level']
+numerical_features = ['age', 'experience_years']
+
+# --- 4. Preprocessing Pipeline ---
 preprocessor = ColumnTransformer(
     transformers=[
-        ('num', StandardScaler(), numerical_features),
-        ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_features)
-    ])
-
-# Split data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-print("Data split into training and testing sets.")
-print(f"Training data shape: {X_train.shape}")
-print(f"Testing data shape: {X_test.shape}\n")
-
-# --- 3. Define Ensemble Models ---
-
-# Random Forest Regressor
-rf_model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
-
-# LightGBM Regressor
-lgbm_model = lgb.LGBMRegressor(n_estimators=100, random_state=42, n_jobs=-1)
-
-# XGBoost Regressor
-xgb_model = xgb.XGBRegressor(n_estimators=100, random_state=42, objective='reg:squarederror', n_jobs=-1)
-
-# Create pipelines for each individual model
-pipeline_rf = Pipeline(steps=[('preprocessor', preprocessor), ('regressor', rf_model)])
-pipeline_lgbm = Pipeline(steps=[('preprocessor', preprocessor), ('regressor', lgbm_model)])
-pipeline_xgb = Pipeline(steps=[('preprocessor', preprocessor), ('regressor', xgb_model)])
-
-# --- 4. Implement Voting Regressor ---
-voting_regressor = VotingRegressor(
-    estimators=[
-        ('rf', rf_model),
-        ('lgbm', lgbm_model),
-        ('xgb', xgb_model)
-    ],
-    n_jobs=-1
+        ('num', Pipeline([
+            ('imputer', SimpleImputer(strategy='median')),
+            ('scaler', StandardScaler())
+        ]), numerical_features),
+        ('cat', Pipeline([
+            ('imputer', SimpleImputer(strategy='constant', fill_value='Unknown')),
+            ('encoder', OneHotEncoder(handle_unknown='ignore'))
+        ]), categorical_features)
+    ]
 )
 
-pipeline_voting = Pipeline(steps=[('preprocessor', preprocessor), ('regressor', voting_regressor)])
+# --- 5. Train-Test Split ---
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42)
+print(f"Train shape: {X_train.shape}, Test shape: {X_test.shape}")
 
-# --- 5. Train and Evaluate Models ---
+# --- 6. Define Models ---
+rf_model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
+lgbm_model = lgb.LGBMRegressor(n_estimators=100, random_state=42, n_jobs=-1)
+xgb_model = xgb.XGBRegressor(n_estimators=100, objective='reg:squarederror', random_state=42, n_jobs=-1)
 
-models = {
-    "Random Forest Regressor": pipeline_rf,
-    "LightGBM Regressor": pipeline_lgbm,
-    "XGBoost Regressor": pipeline_xgb,
-    "Voting Regressor (RF + LGBM + XGBoost)": pipeline_voting
-}
+# Ensemble
+voting_regressor = VotingRegressor([
+    ('rf', rf_model),
+    ('lgbm', lgbm_model),
+    ('xgb', xgb_model)
+], n_jobs=-1)
 
-print("Training and evaluating models...\n")
+# Final pipeline
+pipeline = Pipeline([
+    ('preprocessor', preprocessor),
+    ('regressor', voting_regressor)
+])
 
-for name, model in models.items():
-    print(f"--- Training {name} ---")
-    
-    # Train the model
-    model.fit(X_train, y_train)
-    
-    # Make predictions on the test set
-    y_pred = model.predict(X_test)
-    
-    # Evaluate the model
-    mae = mean_absolute_error(y_test, y_pred)
-    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-    r2 = r2_score(y_test, y_pred)
-    
-    print(f"{name} Performance:")
-    print(f"  Mean Absolute Error (MAE): ${mae:.2f}")
-    print(f"  Root Mean Squared Error (RMSE): ${rmse:.2f}")
-    print(f"  R-squared (R2): {r2:.4f}\n")
+# --- 7. Train ---
+print("\nTraining model...")
+pipeline.fit(X_train, y_train)
 
-print("Model training and evaluation complete.")
+# --- 8. Evaluate ---
+y_pred = pipeline.predict(X_test)
+print("\nModel Evaluation:")
+print("MAE:", mean_absolute_error(y_test, y_pred))
+print("RMSE:", np.sqrt(mean_squared_error(y_test, y_pred)))
+print("R2 Score:", r2_score(y_test, y_pred))
 
-# --- Example of making a prediction with the best performing model (Voting Regressor) ---
-print("--- Example Prediction ---")
-new_employee_data = pd.DataFrame({
-    'age': [30],
-    'hourly': [0],
-    'employer_provided': [0],
-    'min_salary': [50000],
-    'max_salary': [100000],
-    'avg_salary': [75000],
-    'job_state': ['CA'],
-    'python_yn': [1],
-    'R_yn': [0],
-    'spark': [1],
-    'aws': [1],
-    'excel': [1],
-    'job_simp': ['Data Scientist'],
-    'seniority': ['Junior'],
-    'desc_len': [300],
-    'num_comp': [3]
-})
+# --- 9. Predict Example ---
+example = pd.DataFrame([{
+    'age': 30,
+    'job_simp': 'Data Scientist',
+    'education_level': 'Masters',
+    'experience_years': 3
+}])
+predicted_salary = pipeline.predict(example)[0]
+print(f"\nPredicted salary for example employee: ${predicted_salary:.2f}")
 
-predicted_salary = pipeline_voting.predict(new_employee_data)[0]
-print(f"Predicted salary for the new employee: ${predicted_salary:.2f}")
-
-# --- Save the Trained Model ---
-joblib.dump(pipeline_voting, 'salary_prediction_model.pkl')
-print("Trained model saved as 'salary_prediction_model.pkl'")
+# --- 10. Save Model ---
+joblib.dump(pipeline, 'salary_prediction_model.pkl')
+print("\nModel saved as 'salary_prediction_model.pkl'")

@@ -1,231 +1,453 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Salary Predictor</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Salary Predictor - Form</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); /* Vibrant gradient background */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column; /* Allow header to sit at top */
+            justify-content: flex-start; /* Align content to top */
+            align-items: center;
             margin: 0;
             padding: 0;
-            height: 100%;
+            box-sizing: border-box;
+            overflow-y: auto; /* Allow scrolling on body if content overflows */
+            overflow-x: hidden; /* Hide horizontal overflow */
+        }
+
+        /* Header Styles (Consistent across all pages) */
+        header {
             width: 100%;
-            overflow-y: auto; /* Enable scrolling */
+            background: rgba(255, 255, 255, 0.1); /* Slightly transparent header */
+            padding: 1.5rem 2rem;
+            position: sticky; /* Make header sticky */
+            top: 0;
+            z-index: 1000; /* Ensure it's above other content */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px); /* Subtle blur for header */
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px; /* Max width for nav content */
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #ffffff;
+            text-decoration: none;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li {
+            margin-left: 2.5rem;
+        }
+
+        nav ul li a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.15rem;
+            transition: color 0.3s ease, transform 0.2s ease;
+            position: relative;
+            padding-bottom: 0.3rem; /* Space for underline effect */
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background: #34d399; /* Green underline */
+            transition: width 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        nav ul li a:hover::after,
+        nav ul li a.active::after { /* Active link style */
+            width: 100%;
+        }
+
+        /* Main content container positioning */
+        .form-page-content {
+            flex-grow: 1; /* Allows this section to take available space for centering */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Background animation elements */
+        .background-circles {
+            position: fixed; /* Fixed so it doesn't scroll */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .background-circles li {
+            position: absolute;
+            display: block;
+            list-style: none;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            animation: animate 25s linear infinite;
+            bottom: -150px;
+            border-radius: 50%;
+        }
+
+        .background-circles li:nth-child(1) { left: 25%; width: 80px; height: 80px; animation-delay: 0s; }
+        .background-circles li:nth-child(2) { left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s; }
+        .background-circles li:nth-child(3) { left: 70%; width: 20px; height: 20px; animation-delay: 4s; }
+        .background-circles li:nth-child(4) { left: 40%; width: 60px; height: 60px; animation-delay: 0s; animation-duration: 18s; }
+        .background-circles li:nth-child(5) { left: 65%; width: 20px; height: 20px; animation-delay: 0s; }
+        .background-circles li:nth-child(6) { left: 75%; width: 110px; height: 110px; animation-delay: 3s; }
+        .background-circles li:nth-child(7) { left: 35%; width: 150px; height: 150px; animation-delay: 7s; }
+        .background-circles li:nth-child(8) { left: 50%; width: 25px; height: 25px; animation-delay: 15s; animation-duration: 45s; }
+        .background-circles li:nth-child(9) { left: 20%; width: 15px; height: 15px; animation-delay: 2s; animation-duration: 35s; }
+        .background-circles li:nth-child(10) { left: 85%; width: 150px; height: 150px; animation-delay: 0s; animation-duration: 11s; }
+
+        @keyframes animate {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; }
+            100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; }
         }
 
         .form-container {
-            padding: 2rem;
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto; /* Center the form horizontally */
+            background: rgba(255, 255, 255, 0.95); /* Slightly transparent white for a modern feel */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25); /* Stronger, more defined shadow */
+            border-radius: 25px; /* More rounded corners */
+            padding: 3rem; /* Increased padding */
+            max-width: 550px; /* Adjusted max-width */
+            width: 100%; /* Full width within max-width */
+            position: relative;
+            z-index: 1; /* Ensure content is above background */
+            backdrop-filter: blur(10px); /* Glassmorphism effect */
+            animation: fadeIn 1s ease-out; /* Fade-in animation */
+            margin-top: auto; /* Allow vertical centering but also push content if needed */
+            margin-bottom: auto; /* Allow vertical centering but also push content if needed */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-container h1 {
+            font-size: 2.5rem; /* Larger and bolder title */
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem; /* Spacing between form groups */
         }
 
         .form-group label {
-            font-weight: 600;
+            font-weight: 700; /* Bolder labels */
             color: #374151;
+            display: block; /* Ensures label takes full width */
+            margin-bottom: 0.75rem; /* Space between label and input */
+            font-size: 1.125rem; /* Slightly larger label text */
         }
 
-        .form-group input, .form-group select {
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            padding: 0.75rem;
+        .form-group input,
+        .form-group select {
+            border: 2px solid #e2e8f0; /* Slightly thicker border */
+            border-radius: 12px; /* More rounded input fields */
+            padding: 1rem; /* Increased padding */
             width: 100%;
-            margin-top: 0.5rem;
+            box-sizing: border-box; /* Include padding in element's total width and height */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition on focus */
             font-size: 1rem;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            color: #4a5568;
         }
 
-        .form-group input:focus, .form-group select:focus {
+        .form-group input:focus,
+        .form-group select:focus {
             outline: none;
-            border-color: #9333ea;
-            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.3);
+            border-color: #6a11cb; /* Highlight border on focus */
+            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.2); /* Soft glow on focus */
         }
 
         .submit-button {
-            background-color: #9333ea;
-            color: #ffffff;
-            font-weight: 600;
-            padding: 0.75rem;
-            border-radius: 6px;
+            background: linear-gradient(90deg, #6a11cb, #2575fc); /* Gradient button */
+            color: white;
+            font-weight: 700; /* Bolder button text */
+            padding: 1rem; /* Increased padding */
+            border-radius: 12px; /* More rounded button */
             width: 100%;
-            text-align: center;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: none;
+            font-size: 1.25rem; /* Larger button text */
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease; /* Smooth hover effects */
+            display: flex; /* For centering text/spinner */
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .submit-button:hover {
-            background-color: #7e22ce;
-            transform: scale(1.05);
+            transform: translateY(-3px); /* Slight lift effect */
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* More prominent shadow on hover */
+            opacity: 0.9;
         }
 
+        .submit-button:disabled {
+            background: linear-gradient(90deg, #b88ce8, #86aaff); /* Lighter gradient when disabled */
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            opacity: 0.7;
+        }
+
+        /* Initial state of error message to prevent layout shift */
         .error-message {
-            margin-top: 1rem;
-            padding: 1rem;
+            margin-top: 1.5rem; /* More space above error */
+            padding: 0 1.25rem; /* Start with 0 vertical padding */
             background-color: #fee2e2;
             border: 1px solid #f87171;
-            border-radius: 6px;
+            border-radius: 12px; /* Consistent border radius */
             color: #991b1b;
             font-weight: 600;
+            text-align: center;
+            opacity: 0; /* Start hidden */
+            max-height: 0; /* Start collapsed */
+            overflow: hidden;
+            transition: opacity 0.4s ease-out, max-height 0.4s ease-out, padding 0.4s ease-out; /* Smooth show/hide */
+        }
+
+        .error-message:not(.hidden) {
+            opacity: 1;
+            max-height: 200px; /* Arbitrary max-height for smooth transition */
+            padding-top: 1.25rem; /* Apply padding when visible */
+            padding-bottom: 1.25rem; /* Apply padding when visible */
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #ffffff;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem 1.5rem;
+            }
+            .logo {
+                font-size: 1.8rem;
+            }
+            nav ul {
+                display: none; /* Hide nav links on small screens for simplicity */
+            }
+            .form-page-content {
+                padding: 1.5rem;
+            }
+            .form-container {
+                padding: 2.5rem;
+            }
+            .form-container h1 {
+                font-size: 2.8rem;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .form-page-content {
+                padding: 1rem;
+            }
+            .form-container {
+                padding: 1.5rem;
+                border-radius: 15px;
+            }
+
+            .form-container h1 {
+                font-size: 2.2rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .form-group label {
+                font-size: 0.95rem;
+                margin-bottom: 0.4rem;
+            }
+
+            .form-group input,
+            .form-group select {
+                padding: 0.75rem;
+                border-radius: 10px;
+                font-size: 0.9rem;
+            }
+
+            .submit-button {
+                padding: 0.8rem;
+                font-size: 1rem;
+                border-radius: 10px;
+            }
+            .background-circles li {
+                width: 10px;
+                height: 10px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="form-container">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">SALARY PREDICTOR</h1>
+    <header>
+        <nav>
+            <a href="index.html" class="logo">💸 Salary Nexus</a>
+            <ul>
+                <li><a href="homePage.html">Home</a></li>
+                <li><a href="index.html" class="active">Predict</a></li>
+                <li><a href="homePage.html#how-it-works">About</a></li>
+            </ul>
+        </nav>
+    </header>
 
-        <form id="salaryForm" class="space-y-4">
-            <div class="form-group">
-                <label for="age">Age:</label>
-                <input type="number" id="age" name="age" min="18" max="100" required>
-            </div>
-            <div class="form-group">
-                <label for="hourly">Hourly Job:</label>
-                <select id="hourly" name="hourly" required>
-                    <option value="">Select Hourly Job</option>
-                    <option value="1">Yes</option>
-                    <option value="0">No</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="employerProvided">Employer Provided:</label>
-                <select id="employerProvided" name="employerProvided" required>
-                    <option value="">Select Employer Provided</option>
-                    <option value="1">Yes</option>
-                    <option value="0">No</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="jobState">Job State:</label>
-                <select id="jobState" name="jobState" required>
-                    <option value="">Select Job State</option>
-                    <option value="CA">California</option>
-                    <option value="NY">New York</option>
-                    <option value="TX">Texas</option>
-                    <option value="FL">Florida</option>
-                    <option value="WA">Washington</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="python">Python Skill:</label>
-                <select id="python" name="python" required>
-                    <option value="">Select Python Skill</option>
-                    <option value="1">Yes</option>
-                    <option value="0">No</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="jobSimp">Job Simplification:</label>
-                <select id="jobSimp" name="jobSimp" required>
-                    <option value="">Select Job Simplification</option>
-                    <option value="Data Scientist">Data Scientist</option>
-                    <option value="Software Engineer">Software Engineer</option>
-                    <option value="Project Manager">Project Manager</option>
-                    <option value="HR Specialist">HR Specialist</option>
-                    <option value="Marketing Analyst">Marketing Analyst</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="seniority">Seniority:</label>
-                <select id="seniority" name="seniority" required>
-                    <option value="">Select Seniority</option>
-                    <option value="Junior">Junior</option>
-                    <option value="Mid">Mid</option>
-                    <option value="Senior">Senior</option>
-                </select>
-            </div>
+    <ul class="background-circles">
+        <li></li> <li></li> <li></li> <li></li> <li></li>
+        <li></li> <li></li> <li></li> <li></li> <li></li>
+    </ul>
 
-            <div class="form-group">
-    <label for="minSalary">Minimum Salary:</label>
-    <input type="number" id="minSalary" name="minSalary" min="0" required>
-</div>
+    <div class="form-page-content">
+        <div class="form-container">
+            <h1>Predict Salary</h1>
 
-<div class="form-group">
-    <label for="maxSalary">Maximum Salary:</label>
-    <input type="number" id="maxSalary" name="maxSalary" min="0" required>
-</div>
+            <form id="salaryForm" class="space-y-4">
+                <div class="form-group">
+                    <label for="age">Age:</label>
+                    <input type="number" id="age" name="age" min="18" max="100" required />
+                </div>
 
+                <div class="form-group">
+                    <label for="jobSimp">Job Role:</label>
+                    <select id="jobSimp" name="jobSimp" required>
+                        <option value="">Select Job Role</option>
+                        <option value="Data Scientist">Data Scientist</option>
+                        <option value="Software Engineer">Software Engineer</option>
+                        <option value="Project Manager">Project Manager</option>
+                        <option value="HR Specialist">HR Specialist</option>
+                        <option value="Marketing Analyst">Marketing Analyst</option>
+                    </select>
+                </div>
 
+                <div class="form-group">
+                    <label for="educationLevel">Education Level:</label>
+                    <select id="educationLevel" name="educationLevel" required>
+                        <option value="">Select Education Level</option>
+                        <option value="High School">High School</option>
+                        <option value="Bachelors">Bachelors</option>
+                        <option value="Masters">Masters</option>
+                        <option value="PhD">PhD</option>
+                        <option value="Unknown">Unknown</option>
+                    </select>
+                </div>
 
+                <div class="form-group">
+                    <label for="experienceYears">Experience (Years):</label>
+                    <input type="number" id="experienceYears" name="experienceYears" min="0" required />
+                </div>
 
-<div class="form-group">
-    <label for="numComp">Number of Competitors:</label>
-    <input type="number" id="numComp" name="numComp" min="0" required>
-</div>
+                <button type="submit" class="submit-button" id="submitButton">
+                    <span id="buttonText">Predict Salary</span>
+                </button>
+            </form>
 
-            <button type="submit" class="submit-button">
-                <span id="buttonText">Predict Salary</span>
-            </button>
-        </form>
-
-        <div id="messageBox" class="error-message hidden"></div>
+            <div id="messageBox" class="error-message hidden"></div>
+        </div>
     </div>
 
     <script>
-        document.getElementById('salaryForm').addEventListener('submit', async function(event) {
+        document.getElementById('salaryForm').addEventListener('submit', async function (event) {
             event.preventDefault();
 
+            const submitButton = document.getElementById('submitButton');
             const buttonText = document.getElementById('buttonText');
             const messageBox = document.getElementById('messageBox');
 
-            buttonText.textContent = 'Predicting...';
+            // Clear previous messages and hide
             messageBox.classList.add('hidden');
-
-            const age = parseFloat(document.getElementById('age').value);
-            const hourly = parseInt(document.getElementById('hourly').value);
-            const employerProvided = parseInt(document.getElementById('employerProvided').value);
-            const jobState = document.getElementById('jobState').value;
-            const python = parseInt(document.getElementById('python').value);
-            const jobSimp = document.getElementById('jobSimp').value;
-            const seniority = document.getElementById('seniority').value;
-            const minSalary = parseFloat(document.getElementById('minSalary').value);
-            const maxSalary = parseFloat(document.getElementById('maxSalary').value);
-            const numComp = parseInt(document.getElementById('numComp').value);
+            messageBox.style.maxHeight = '0';
+            messageBox.style.paddingTop = '0';
+            messageBox.style.paddingBottom = '0';
+            messageBox.style.opacity = '0';
 
 
-            if (!age || hourly === null || employerProvided === null || !jobState || python === null || !jobSimp || !seniority) {
-                messageBox.textContent = 'Please fill in all fields.';
-                messageBox.classList.remove('hidden');
-                buttonText.textContent = 'Predict Salary';
-                return;
-            }
+            // Disable button and show loading state
+            submitButton.disabled = true;
+            buttonText.innerHTML = '<div class="spinner"></div> Predicting...'; // Add spinner
 
             try {
+                const payload = {
+                    age: parseFloat(document.getElementById('age').value),
+                    job_simp: document.getElementById('jobSimp').value,
+                    education_level: document.getElementById('educationLevel').value,
+                    experience_years: parseFloat(document.getElementById('experienceYears').value),
+                };
+
                 const response = await fetch('http://127.0.0.1:5000/predict_salary', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        age,
-                        hourly,
-                        employer_provided: employerProvided,
-                        job_state: jobState,
-                        python_yn: python,
-                        job_simp: jobSimp,
-                        seniority,
-                        min_salary: minSalary,
-                        max_salary: maxSalary,
-                        num_comp: numComp
-                    })
+                    body: JSON.stringify(payload),
                 });
 
-                if (!response.ok) {
-                    throw new Error('Failed to fetch prediction from the server.');
-                }
-
                 const data = await response.json();
-                if (data.predicted_salary) {
+
+                if (response.ok && data.predicted_salary !== undefined) {
                     window.location.href = `prediction.html?salary=${data.predicted_salary}`;
                 } else {
-                    messageBox.textContent = 'Error: Unable to get prediction.';
-                    messageBox.classList.remove('hidden');
+                    const errorMessage = data.message || 'An unexpected error occurred. Please try again.';
+                    throw new Error(errorMessage);
                 }
             } catch (error) {
-                console.error('Error:', error);
-                messageBox.textContent = 'An error occurred while predicting the salary.';
-                messageBox.classList.remove('hidden');
+                console.error('Prediction Error:', error);
+                messageBox.textContent = `Error: ${error.message}`;
+                messageBox.classList.remove('hidden'); // Remove hidden to allow transition
+                messageBox.style.maxHeight = '200px'; // Expand to show message
+                messageBox.style.paddingTop = '1.25rem'; // Restore padding
+                messageBox.style.paddingBottom = '1.25rem'; // Restore padding
+                messageBox.style.opacity = '1';
+
             } finally {
+                // Re-enable button and restore text
+                submitButton.disabled = false;
                 buttonText.textContent = 'Predict Salary';
             }
         });
