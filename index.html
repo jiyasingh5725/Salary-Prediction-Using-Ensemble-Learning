@@ -9,37 +9,18 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #3b82f6, #9333ea);
-            animation: gradientBG 16s ease infinite;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             margin: 0;
-        }
-
-        @keyframes gradientBG {
-            0% { background: linear-gradient(135deg, #3b82f6, #9333ea); }
-            20% { background: linear-gradient(135deg, #9333ea, #f59e0b); }
-            40% { background: linear-gradient(135deg, #f59e0b, #10b981); }
-            60% { background: linear-gradient(135deg, #10b981, #3b82f6); }
-            80% { background: linear-gradient(135deg, #3b82f6, #9333ea); }
-            100% { background: linear-gradient(135deg, #3b82f6, #9333ea); }
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow-y: auto; /* Enable scrolling */
         }
 
         .form-container {
-            background-color: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            border-radius: 12px;
             padding: 2rem;
-            max-width: 500px;
             width: 100%;
-            animation: fadeIn 1s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            max-width: 800px;
+            margin: 0 auto; /* Center the form horizontally */
         }
 
         .form-group label {
@@ -88,13 +69,12 @@
             border-radius: 6px;
             color: #991b1b;
             font-weight: 600;
-            animation: fadeIn 0.5s ease;
         }
     </style>
 </head>
 <body>
     <div class="form-container">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Salary Predictor</h1>
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">SALARY PREDICTOR</h1>
 
         <form id="salaryForm" class="space-y-4">
             <div class="form-group">
@@ -102,37 +82,79 @@
                 <input type="number" id="age" name="age" min="18" max="100" required>
             </div>
             <div class="form-group">
-                <label for="yearsExperience">Years of Experience:</label>
-                <input type="number" id="yearsExperience" name="yearsExperience" step="0.1" min="0" max="50" required>
-            </div>
-            <div class="form-group">
-                <label for="educationLevel">Education Level:</label>
-                <select id="educationLevel" name="educationLevel" required>
-                    <option value="">Select Education</option>
-                    <option value="High School">High School</option>
-                    <option value="Bachelor's">Bachelor's</option>
-                    <option value="Master's">Master's</option>
-                    <option value="PhD">PhD</option>
+                <label for="hourly">Hourly Job:</label>
+                <select id="hourly" name="hourly" required>
+                    <option value="">Select Hourly Job</option>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="jobTitle">Job Title:</label>
-                <select id="jobTitle" name="jobTitle" required>
-                    <option value="">Select Job Title</option>
-                    <option value="Software Engineer">Software Engineer</option>
+                <label for="employerProvided">Employer Provided:</label>
+                <select id="employerProvided" name="employerProvided" required>
+                    <option value="">Select Employer Provided</option>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="jobState">Job State:</label>
+                <select id="jobState" name="jobState" required>
+                    <option value="">Select Job State</option>
+                    <option value="CA">California</option>
+                    <option value="NY">New York</option>
+                    <option value="TX">Texas</option>
+                    <option value="FL">Florida</option>
+                    <option value="WA">Washington</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="python">Python Skill:</label>
+                <select id="python" name="python" required>
+                    <option value="">Select Python Skill</option>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="jobSimp">Job Simplification:</label>
+                <select id="jobSimp" name="jobSimp" required>
+                    <option value="">Select Job Simplification</option>
                     <option value="Data Scientist">Data Scientist</option>
+                    <option value="Software Engineer">Software Engineer</option>
                     <option value="Project Manager">Project Manager</option>
+                    <option value="HR Specialist">HR Specialist</option>
+                    <option value="Marketing Analyst">Marketing Analyst</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="country">Country:</label>
-                <select id="country" name="country" required>
-                    <option value="">Select Country</option>
-                    <option value="USA">USA</option>
-                    <option value="Canada">Canada</option>
-                    <option value="UK">UK</option>
+                <label for="seniority">Seniority:</label>
+                <select id="seniority" name="seniority" required>
+                    <option value="">Select Seniority</option>
+                    <option value="Junior">Junior</option>
+                    <option value="Mid">Mid</option>
+                    <option value="Senior">Senior</option>
                 </select>
             </div>
+
+            <div class="form-group">
+    <label for="minSalary">Minimum Salary:</label>
+    <input type="number" id="minSalary" name="minSalary" min="0" required>
+</div>
+
+<div class="form-group">
+    <label for="maxSalary">Maximum Salary:</label>
+    <input type="number" id="maxSalary" name="maxSalary" min="0" required>
+</div>
+
+
+
+
+<div class="form-group">
+    <label for="numComp">Number of Competitors:</label>
+    <input type="number" id="numComp" name="numComp" min="0" required>
+</div>
+
             <button type="submit" class="submit-button">
                 <span id="buttonText">Predict Salary</span>
             </button>
@@ -152,12 +174,18 @@
             messageBox.classList.add('hidden');
 
             const age = parseFloat(document.getElementById('age').value);
-            const yearsExperience = parseFloat(document.getElementById('yearsExperience').value);
-            const educationLevel = document.getElementById('educationLevel').value;
-            const jobTitle = document.getElementById('jobTitle').value;
-            const country = document.getElementById('country').value;
+            const hourly = parseInt(document.getElementById('hourly').value);
+            const employerProvided = parseInt(document.getElementById('employerProvided').value);
+            const jobState = document.getElementById('jobState').value;
+            const python = parseInt(document.getElementById('python').value);
+            const jobSimp = document.getElementById('jobSimp').value;
+            const seniority = document.getElementById('seniority').value;
+            const minSalary = parseFloat(document.getElementById('minSalary').value);
+            const maxSalary = parseFloat(document.getElementById('maxSalary').value);
+            const numComp = parseInt(document.getElementById('numComp').value);
 
-            if (!age || !yearsExperience || !educationLevel || !jobTitle || !country) {
+
+            if (!age || hourly === null || employerProvided === null || !jobState || python === null || !jobSimp || !seniority) {
                 messageBox.textContent = 'Please fill in all fields.';
                 messageBox.classList.remove('hidden');
                 buttonText.textContent = 'Predict Salary';
@@ -169,11 +197,16 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        Age: age,
-                        YearsExperience: yearsExperience,
-                        EducationLevel: educationLevel,
-                        JobTitle: jobTitle,
-                        Country: country
+                        age,
+                        hourly,
+                        employer_provided: employerProvided,
+                        job_state: jobState,
+                        python_yn: python,
+                        job_simp: jobSimp,
+                        seniority,
+                        min_salary: minSalary,
+                        max_salary: maxSalary,
+                        num_comp: numComp
                     })
                 });
 
@@ -183,7 +216,6 @@
 
                 const data = await response.json();
                 if (data.predicted_salary) {
-                    // Redirect to a new page with the prediction data
                     window.location.href = `prediction.html?salary=${data.predicted_salary}`;
                 } else {
                     messageBox.textContent = 'Error: Unable to get prediction.';

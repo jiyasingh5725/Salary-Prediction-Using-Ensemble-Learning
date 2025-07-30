@@ -26,18 +26,28 @@ def predict_salary():
 
     try:
         data = request.get_json(force=True)
-        required_fields = ['Age', 'YearsExperience', 'EducationLevel', 'JobTitle', 'Country']
+        required_fields = ['age', 'hourly', 'employer_provided', 'job_state', 'python_yn', 'job_simp', 'seniority', 'min_salary', 'max_salary', 'num_comp']
         for field in required_fields:
             if field not in data:
                 return jsonify({"error": f"Missing required field: {field}"}), 400
 
+        # Convert input data to DataFrame
         input_df = pd.DataFrame([data])
-        input_df['Age'] = pd.to_numeric(input_df['Age'], errors='coerce')
-        input_df['YearsExperience'] = pd.to_numeric(input_df['YearsExperience'], errors='coerce')
 
-        if input_df['Age'].isnull().any() or input_df['YearsExperience'].isnull().any():
-            return jsonify({"error": "Age and YearsExperience must be valid numbers."}), 400
+        # Validate numerical fields
+        input_df['age'] = pd.to_numeric(input_df['age'], errors='coerce')
+        input_df['hourly'] = pd.to_numeric(input_df['hourly'], errors='coerce')
+        input_df['employer_provided'] = pd.to_numeric(input_df['employer_provided'], errors='coerce')
+        input_df['python_yn'] = pd.to_numeric(input_df['python_yn'], errors='coerce')
+        input_df['min_salary'] = pd.to_numeric(input_df['min_salary'], errors='coerce')
+        input_df['max_salary'] = pd.to_numeric(input_df['max_salary'], errors='coerce')
+        input_df['num_comp'] = pd.to_numeric(input_df['num_comp'], errors='coerce')
 
+
+        if input_df[required_fields].isnull().any().any():
+         return jsonify({"error": "Some required fields contain invalid or missing values."}), 400
+
+        # Make prediction
         prediction = model_pipeline.predict(input_df)[0]
         return jsonify({"predicted_salary": float(prediction)})
 
